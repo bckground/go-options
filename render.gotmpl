@@ -64,12 +64,15 @@ type {{ $.optionTypeName }} interface {
     apply(*{{ $.configTypeName }}) {{ if $.returnError -}} error {{ end }}
 }
 
+type {{ $.optionNamespaceType }} struct {}
+
+var {{ $.optionNamespace }} {{ $.optionNamespaceType }}
+
 {{ range .options }}{{ $option := . }}
 
-{{ $name := .PublicName | ToPublic | printf "%s%s" $.optionPrefix }}
-{{ if $.optionSuffix }}{{ $name = $.optionSuffix | printf "%s%s" (.PublicName | ToPublic) }}{{ end }}
+{{ $name := .PublicName | ToPublic }}
 
-{{ $implName := $name | printf "%sImpl" | ToPrivate }}
+{{ $implName := .PublicName | ToPrivate | printf "%sImpl" }}
 
 type {{ $implName }} struct {
 {{- range .Fields }}
@@ -124,7 +127,7 @@ func (o {{ $implName }}) String() string {
 {{- range $i, $doc := .Docs }}{{ if eq $i 0 }}{{ $name }} {{ end }}{{ $doc }}{{ end -}}
 */
 {{ end -}}
-func {{ $name }}(
+func ({{ $.optionNamespaceType }}) {{ $name }}(
 {{- range $i, $f := .Fields }}{{ if ne $i 0 }},{{ end }}{{ $f.ParamName }} {{ $f.ParamType }}{{ end -}}
 ) {{ $.optionTypeName }} {
     return {{ $implName }}{
