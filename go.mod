@@ -1,4 +1,4 @@
-module github.com/launchdarkly/go-options
+module github.com/bckground/go-options
 
 go 1.23.5
 
