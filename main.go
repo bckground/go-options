@@ -29,8 +29,7 @@ var applyFunctionName string
 var applyOptionFunctionType string
 var createNewFunc bool
 var runGoFmt bool
-var optionPrefix string
-var optionSuffix string
+var optionNamespace string
 var buildTag string
 var imports string
 var quoteStrings bool
@@ -57,8 +56,7 @@ func initFlags() {
 	flag.StringVar(&applyFunctionName, "func", "", `name of function created to apply options to <type> (default is "apply<Type>Options")`)
 	flag.StringVar(&applyOptionFunctionType, "option_func", "",
 		`name of function type created to apply options with pointer receiver to <type> (default is "apply<Option>Func")`)
-	flag.StringVar(&optionPrefix, "prefix", "", `name of prefix to use for options (default is the same as "option")`)
-	flag.StringVar(&optionSuffix, "suffix", "", `name of suffix to use for options (forces use of suffix, cannot with used with prefix)`)
+	flag.StringVar(&optionNamespace, "namespace", "", `name of namespace variable for options (default is "${option}Namespace")`)
 	flag.StringVar(&buildTag, "build", "", `build tags to add at the top of the file`)
 	flag.BoolVar(&quoteStrings, "quote-default-strings", true, `set to false to disable automatic quoting of string field defaults`)
 	flag.BoolVar(&implementString, "stringer", true, `set to false to disable creating String() method for options`)
@@ -98,10 +96,6 @@ func main() {
 	flag.Parse()
 	flag.CommandLine.ErrorHandling()
 	types := flag.Args()
-
-	if optionPrefix != "" && optionSuffix != "" {
-		log.Fatal("cannot specify both -prefix and -suffix options")
-	}
 
 	if typeName == "" && len(types) == 0 {
 		flag.Usage()
@@ -324,23 +318,25 @@ func writeOptionsFile(types []string, packageName string, node ast.Node, fset *t
 
 		buf := bytes.NewBuffer(nil)
 		if buildTag != "" {
-			buf.WriteString(fmt.Sprintf("//go:build %s\n\n", buildTag))
+			fmt.Fprintf(buf, "//go:build %s\n\n", buildTag)
 		}
 
-		buf.WriteString(fmt.Sprintf("package %s\n\n", packageName))
-
-		prefix := optionInterfaceName
-		if optionPrefix != "" {
-			prefix = optionPrefix
+		namespace := optionNamespace
+		if namespace == "" {
+			namespace = optionInterfaceName + "Namespace"
 		}
+		namespaceType := strings.ToLower(string(optionInterfaceName[0])) + optionInterfaceName[1:] + "Namespace"
 
 		err := codeTemplate.Execute(buf, map[string]interface{}{
+			"argv":                append([]string{"go-options"}, os.Args[1:]...),
+			"packageName":         packageName,
+			"typeName":            typeName,
 			"imports":             importList,
 			"options":             options,
 			"optionTypeName":      optionInterfaceName,
 			"configTypeName":      typeName,
-			"optionPrefix":        prefix,
-			"optionSuffix":        optionSuffix,
+			"optionNamespace":     namespace,
+			"optionNamespaceType": namespaceType,
 			"applyFuncName":       applyFunctionName,
 			"applyOptionFuncName": applyOptionFunctionType,
 			"createNewFunc":       createNewFunc,

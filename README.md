@@ -1,11 +1,11 @@
-# LaunchDarkly Options Generator
+# Options Generator
 
-[![CircleCI](https://circleci.com/gh/launchdarkly/go-options.svg?style=svg)](https://circleci.com/gh/launchdarkly/go-options)
+A fork of the [LaunchDarkly Options Generator](https://github.com/launchdarkly/go-options).
 
-The LaunchDarkly Options Generator generates boilerplate code for setting options for a configuration struct using varargs syntax.  You write this:
+This Options Generator generates boilerplate code for setting options for a configuration struct using varargs syntax.  You write this:
 
 ```go
-//go:generate go-options config
+//go:generate go-options -namespace=ConfigOptions -option=ConfigOption config
 type config struct {
 	howMany int
 }
@@ -14,7 +14,7 @@ type config struct {
 Then run go generate and you can write this:
 
 ```go
-cfg, err := newConfig(OptionHowMany(100))
+cfg, err := newConfig(ConfigOptions.HowMany(100))
 ```
 
 or, more interestingly, this:
@@ -24,7 +24,7 @@ type Collection {
     config
 }
 
-func NewCollection(options... Option) (Foo, err) {
+func NewCollection(options... ConfigOption) (Foo, err) {
     cfg, err := newConfig(options...)
     return Collection{cfg}, err
 }
@@ -33,18 +33,18 @@ func NewCollection(options... Option) (Foo, err) {
 You can also specify default values and override the option name as follows:
 
 ```go
-//go:generate go-options config
+//go:generate go-options -namespace=ConfigOptions -option=ConfigOption config
 type config struct {
 	howMany int `options:"number,5"
 }
 ```
 
-This would create `OptionNumber` with a default value of 5.  Entering the the tag `options:",5"` would keep the default `OptionHowMany` name.
+This would create `ConfigOptions.Number` with a default value of 5.  Entering the the tag `options:",5"` would keep the default `ConfigOptions.HowMany` name.
 
 You can also specify documentation using docstrings or line strings, so:
 
 ```go
-//go:generate go-options config
+//go:generate go-options -namespace=ConfigOptions -option=ConfigOption config
 type config struct {
     // indicates the number of items
     howMany int // no more than 10
@@ -54,9 +54,9 @@ type config struct {
 would generate code that looks like this:
 
 ```go
-// OptionHowMany indicates the number of items
+// HowMany indicates the number of items
 // no more than ten
-func OptionHowMany(o int) applyOptionFunc {
+func (configOptionNamespace) HowMany(o int) Option {
     // ...
 }
 ```
@@ -75,7 +75,7 @@ type config struct {
 would yield:
 
 ```go
-func OptionNumber(a int, b int) applyOptionFunc {
+func (configOptionNamespace) Number(a int, b int) Option {
     // ...
 }
 ```
@@ -92,11 +92,11 @@ type config struct {
 would yield:
 
 ```
-func OptionNumbers(numbers ...int) applyOptionFunc {
+func (configOptionNamespace) Numbers(numbers ...int) Option {
     // ...
 }
 
-func OptionInts(nums ...int) applyOptionFunc {
+func (configOptionNamespace) Ints(nums ...int) Option {
     // ...
 }
 ```
@@ -114,11 +114,11 @@ type config struct {
 would yield:
 
 ```
-func OptionValue(o ...int) applyOptionFunc {
+func (configOptionNamespace) Value(o ...int) Option {
     // ...
 }
 
-func OptionMyValue(o ...int) applyOptionFunc {
+func (configOptionNamespace) MyValue(o ...int) Option {
     // ...
 }
 ```
@@ -126,16 +126,16 @@ func OptionMyValue(o ...int) applyOptionFunc {
 Generated options are interoperable with any other user-created options that support the option interface:
 
 ```
-type Option interface {
+type ConfigOption interface {
     apply(config *c) error
 }
 ```
 
-The name `Option` can be customized along with various method names as shown under [Options](#options) below.
+The name `ConfigOption` can be customized along with various method names as shown under [Options](#options) below.
 
 ## Installation
 
-Install with `go get -u github.com/launchdarkly/go-options`.
+Install with `go get -u github.com/bckground/go-options`.
 
 ## Tag Syntax
 
@@ -167,8 +167,7 @@ option.  This method fulfills the `fmt.Stringer` interface, allowing more detail
 - `-option <string>` sets name of the interface to use for options (default "Option")
 - `-output <string>` sets the name of the output file (default is <type>_options.go)
 - `-input <string>` sets the name of the input file. When set uses "go/build" and "go/parser" directly, which can result in performance improvements
-- `-prefix <string>` sets prefix to be used for options (defaults to the value of `option`)
+- `-namespace <string>` sets the name of the namespace variable for options (default is "${option}Namespace")
 - `-quote-default-strings=false` disables default quoting of default values for string
 - `-stringer=false` controls whether we generate an `String()` method that exposes option names and values.  Useful for debugging tests. (default true)
-- `-suffix <string>` sets suffix to be used for options (instead of prefix, cannot be used with `prefix` option)
 - `-type <string>` name of struct type to create options for (original syntax before multiple types on command-line were supported)
