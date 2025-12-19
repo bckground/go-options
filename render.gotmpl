@@ -72,7 +72,7 @@ var {{ $.optionNamespace }} {{ $.optionNamespaceType }}
 
 {{ $name := .PublicName | ToPublic }}
 
-{{ $implName := .PublicName | ToPrivate | printf "%sImpl" }}
+{{ $implName := printf "%s%sImpl" ($.optionTypeName | ToPrivate) $name }}
 
 type {{ $implName }} struct {
 {{- range .Fields }}
