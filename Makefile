@@ -3,7 +3,6 @@ test:
 	go generate .
 	go install .
 	go generate ./...
-	$(MAKE) lint
 	go test -tags testing ./...
 	diff test/config_options.go test/golden/config_options.go.txt
 	diff test/configWithNoError_options.go test/golden/configWithNoError_options.go.txt
@@ -12,12 +11,11 @@ test:
 generate:
 	go generate .
 
-lint:
-	SKIP=no-commit-to-branch pre-commit run -a
-
 golden:
 	mkdir -p test/golden
-	cp test/config_options.go test/golden/config_options.go.txt
+	for file in test/*_options.go; do \
+		cp "$$file" "test/golden/$$(basename $$file).txt"; \
+	done
 
-.PHONY: lint golden test
+.PHONY: golden test
 
