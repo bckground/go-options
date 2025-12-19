@@ -318,20 +318,19 @@ func writeOptionsFile(types []string, packageName string, node ast.Node, fset *t
 
 		buf := bytes.NewBuffer(nil)
 		if buildTag != "" {
-			buf.WriteString(fmt.Sprintf("//go:build %s\n\n", buildTag))
+			fmt.Fprintf(buf, "//go:build %s\n\n", buildTag)
 		}
-
-		buf.WriteString(fmt.Sprintf("package %s\n\n", packageName))
 
 		namespace := optionNamespace
 		if namespace == "" {
 			namespace = optionInterfaceName + "Namespace"
 		}
-
-		// Compute namespace type (private version with "Namespace" suffix)
 		namespaceType := strings.ToLower(string(optionInterfaceName[0])) + optionInterfaceName[1:] + "Namespace"
 
 		err := codeTemplate.Execute(buf, map[string]interface{}{
+			"argv":                append([]string{"go-options"}, os.Args[1:]...),
+			"packageName":         packageName,
+			"typeName":            typeName,
 			"imports":             importList,
 			"options":             options,
 			"optionTypeName":      optionInterfaceName,
