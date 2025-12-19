@@ -6,7 +6,7 @@ import (
 	time2 "time"
 )
 
-//go:generate go run . -imports=time,net/url,time2=time config
+//go:generate go run .. -imports=time,net/url,time2=time -namespace=OptionNs -option=Option config
 type config struct {
 	myInt            int
 	myIntWithDefault int `options:",1"`
@@ -60,46 +60,46 @@ type config struct {
 	WithBothJsonAndOptions  string `json:"-" options:"gotBoth"`
 }
 
-//go:generate go run . -func applyDifferent -option DifferentOption -new=false configWithDifferentApply
+//go:generate go run .. -func applyDifferent -option DifferentOption -new=false configWithDifferentApply
 type configWithDifferentApply struct {
 }
 
-//go:generate go run . -prefix Opt -option MyOpt configWithDifferentPrefix
+//go:generate go run .. -namespace=MyOptNs -option=MyOpt configWithDifferentPrefix
 type configWithDifferentPrefix struct {
 	myFloat float64
 }
 
-//go:generate go run . -suffix Option -option SuffixOption configWithSuffix
+//go:generate go run .. -namespace=SuffixOptionNs -option=SuffixOption configWithSuffix
 type configWithSuffix struct {
 	myFloat float64
 }
 
-//go:generate go run . -quote-default-strings=false -option UnquotedOption configWithUnquotedString
+//go:generate go run .. -quote-default-strings=false -namespace=UnquotedOptionNs -option=UnquotedOption configWithUnquotedString
 type configWithUnquotedString struct {
 	myString string `options:",\"quoted\""`
 }
 
-//go:generate go run . -cmp=false -option NoCmpOption configWithoutCmp
+//go:generate go run .. -cmp=false -namespace=NoCmpOptionNs -option=NoCmpOption configWithoutCmp
 type configWithoutCmp struct {
 	myInt int
 }
 
-//go:generate go run . -stringer=false -option NoStringerOption configWithoutStringer
+//go:generate go run .. -stringer=false -namespace=NoStringerOptionNs -option=NoStringerOption configWithoutStringer
 type configWithoutStringer struct {
 	myInt int
 }
 
-//go:generate go run . -noerror=false -option NoErrorOption configWithNoError
+//go:generate go run .. -noerror=false -namespace=NoErrorOptionNs -option=NoErrorOption configWithNoError
 type configWithNoError struct {
 	myInt int
 }
 
-//go:generate go run . -public=true -option PublicFuncOption configWithPublicNewFunc
+//go:generate go run .. -public=true -namespace=PublicFuncOptionNs -option=PublicFuncOption configWithPublicNewFunc
 type configWithPublicNewFunc struct {
 	myInt int
 }
 
-//go:generate go run . -build=testing -func applyBuild -prefix BuildOpt -option BuildOption configWithBuild
+//go:generate go run .. -build=testing -func applyBuild -namespace=BuildOptionNs -option=BuildOption configWithBuild
 type configWithBuild struct {
 	myInt int
 }
