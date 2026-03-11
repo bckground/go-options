@@ -32,7 +32,7 @@ func (f {{ $applyOptionFuncType }}) apply(c *{{ $.configTypeName }}) {{ if $.ret
     {{ if $.returnError -}} return {{ end }} f(c)
 }
 
-{{ $applyFuncName := or $.applyFuncName (printf "apply%sOptions" (ToPublic $.configTypeName)) }}
+{{ $applyFuncName := or $.applyFuncName (printf "applyOptionsTo%s" (ToPublic $.configTypeName)) }}
 
 {{ if $.createNewFunc}}
 func {{ if $.newFuncPublic -}}New{{- else -}}new{{- end -}}{{ $.configTypeName | ToPublic}}(options ...{{ $.optionTypeName }}) {{ if $.returnError -}} ({{ $.configTypeName }} , error) {{else}} {{ $.configTypeName }} {{ end }} {
