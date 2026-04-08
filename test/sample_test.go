@@ -39,7 +39,7 @@ var _ = Describe("Generating options", func() {
 
 	It("generates options to set config value", func() {
 		myInt := 456
-		err := applyConfigOptions(&cfg,
+		err := applyOptionsToConfig(&cfg,
 			OptionNs.MyInt(123),
 			OptionNs.MyFloat(4.56),
 			OptionNs.MyString("my-string"),
@@ -62,7 +62,7 @@ var _ = Describe("Generating options", func() {
 	})
 
 	It("sets default values", func() {
-		err := applyConfigOptions(&cfg)
+		err := applyOptionsToConfig(&cfg)
 		Ω(err).ShouldNot(HaveOccurred())
 		Ω(cfg.myIntWithDefault).Should(Equal(1))
 		Ω(cfg.myStringWithDefault).Should(Equal("default string"))
@@ -79,38 +79,38 @@ var _ = Describe("Generating options", func() {
 	})
 
 	It("returns errors", func() {
-		err := applyConfigOptions(&cfg, OptionMakeError{})
+		err := applyOptionsToConfig(&cfg, OptionMakeError{})
 		Ω(err).Should(MatchError("bad news"))
 	})
 
 	It("allows option constructor to be renamed", func() {
-		err := applyConfigOptions(&cfg, OptionNs.YourInt(1))
+		err := applyOptionsToConfig(&cfg, OptionNs.YourInt(1))
 		Ω(err).ShouldNot(HaveOccurred())
 		Ω(cfg.myRenamedInt).To(Equal(1))
 	})
 
 	Describe("custom options", func() {
 		It("can be extended with custom options", func() {
-			err := applyConfigOptions(&cfg, OptionSetMyInt123{})
+			err := applyOptionsToConfig(&cfg, OptionSetMyInt123{})
 			Ω(err).ShouldNot(HaveOccurred())
 			Ω(cfg.myInt).Should(Equal(123))
 		})
 
 		It("returns error from custom options", func() {
-			err := applyConfigOptions(&cfg, OptionMakeError{})
+			err := applyOptionsToConfig(&cfg, OptionMakeError{})
 			Ω(err).Should(MatchError("bad news"))
 		})
 	})
 
 	Describe("imports", func() {
 		It("works with imported types", func() {
-			err := applyConfigOptions(&cfg, OptionNs.MyDuration(time.Second))
+			err := applyOptionsToConfig(&cfg, OptionNs.MyDuration(time.Second))
 			Ω(err).ShouldNot(HaveOccurred())
 			Ω(cfg.myDuration).Should(Equal(time.Second))
 		})
 
 		It("works with aliased imports", func() {
-			err := applyConfigOptions(&cfg, OptionNs.MyDuration2(time.Second))
+			err := applyOptionsToConfig(&cfg, OptionNs.MyDuration2(time.Second))
 			Ω(err).ShouldNot(HaveOccurred())
 			Ω(cfg.myDuration).Should(Equal(time.Second))
 		})
@@ -118,7 +118,7 @@ var _ = Describe("Generating options", func() {
 		It("works with nested packages", func() {
 			myURL, err := url.Parse("http://example.com")
 			Ω(err).ShouldNot(HaveOccurred())
-			err = applyConfigOptions(&cfg, OptionNs.MyURL(*myURL))
+			err = applyOptionsToConfig(&cfg, OptionNs.MyURL(*myURL))
 			Ω(err).ShouldNot(HaveOccurred())
 			Ω(cfg.myURL).Should(Equal(*myURL))
 		})
@@ -126,11 +126,11 @@ var _ = Describe("Generating options", func() {
 
 	Describe("pointers", func() {
 		It("can store a pointer to let us know if a value was set", func() {
-			err := applyConfigOptions(&cfg)
+			err := applyOptionsToConfig(&cfg)
 			Ω(err).ShouldNot(HaveOccurred())
 			Ω(cfg.myPointerToInt).Should(BeNil())
 
-			err = applyConfigOptions(&cfg, OptionNs.MyPointerToInt(1))
+			err = applyOptionsToConfig(&cfg, OptionNs.MyPointerToInt(1))
 			Ω(err).ShouldNot(HaveOccurred())
 			Ω(cfg.myPointerToInt).ShouldNot(BeNil())
 			Ω(*cfg.myPointerToInt).Should(Equal(1))
@@ -143,24 +143,24 @@ var _ = Describe("Generating options", func() {
 
 	Describe("nested structs", func() {
 		It("generates a constructor", func() {
-			err := applyConfigOptions(&cfg, OptionNs.MyStruct(1, 2))
+			err := applyOptionsToConfig(&cfg, OptionNs.MyStruct(1, 2))
 			Ω(err).ShouldNot(HaveOccurred())
 			Ω(cfg.myStruct.a).Should(Equal(1))
 			Ω(cfg.myStruct.b).Should(Equal(2))
 		})
 
 		It("allows default values", func() {
-			err := applyConfigOptions(&cfg)
+			err := applyOptionsToConfig(&cfg)
 			Ω(err).ShouldNot(HaveOccurred())
 			Ω(cfg.myStructWithDefault.a).Should(Equal(1))
 		})
 
 		It("defaults pointer structs to nil", func() {
-			err := applyConfigOptions(&cfg)
+			err := applyOptionsToConfig(&cfg)
 			Ω(err).ShouldNot(HaveOccurred())
 			Ω(cfg.myPointerToStruct).Should(BeNil())
 
-			err = applyConfigOptions(&cfg, OptionNs.MyPointerToStruct(1, 2))
+			err = applyOptionsToConfig(&cfg, OptionNs.MyPointerToStruct(1, 2))
 			Ω(err).ShouldNot(HaveOccurred())
 			Ω(cfg.myPointerToStruct).ShouldNot(BeNil())
 			Ω(cfg.myPointerToStruct.a).Should(Equal(1))
@@ -168,7 +168,7 @@ var _ = Describe("Generating options", func() {
 		})
 
 		It("allows variadic arguments within a slice", func() {
-			err := applyConfigOptions(&cfg, OptionNs.MyStructWithVariadicSlice(1, 1, 2))
+			err := applyOptionsToConfig(&cfg, OptionNs.MyStructWithVariadicSlice(1, 1, 2))
 			Ω(err).ShouldNot(HaveOccurred())
 			Ω(cfg.myStructWithDefault.a).Should(Equal(1))
 		})
@@ -187,24 +187,24 @@ var _ = Describe("Generating options", func() {
 
 	Describe("variadic slices", func() {
 		It("creates a variadic constructor", func() {
-			err := applyConfigOptions(&cfg, OptionNs.MySlice(1, 2))
+			err := applyOptionsToConfig(&cfg, OptionNs.MySlice(1, 2))
 			Ω(err).ShouldNot(HaveOccurred())
 			Ω(cfg.mySlice).Should(ConsistOf(1, 2))
 		})
 
 		It("allows them to be optional", func() {
-			err := applyConfigOptions(&cfg)
+			err := applyOptionsToConfig(&cfg)
 			Ω(err).ShouldNot(HaveOccurred())
 			Ω(cfg.myPointerToSlice).Should(BeNil())
 
-			err = applyConfigOptions(&cfg, OptionNs.MyPointerToSlice(1, 2))
+			err = applyOptionsToConfig(&cfg, OptionNs.MyPointerToSlice(1, 2))
 			Ω(err).ShouldNot(HaveOccurred())
 			Ω(cfg.myPointerToSlice).ShouldNot(BeNil())
 			Ω(*cfg.myPointerToSlice).Should(ConsistOf(1, 2))
 		})
 
 		It("allows them to be renamed", func() {
-			err := applyConfigOptions(&cfg, OptionNs.YourSlice(1, 2))
+			err := applyOptionsToConfig(&cfg, OptionNs.YourSlice(1, 2))
 			Ω(err).ShouldNot(HaveOccurred())
 			Ω(cfg.myRenamedSlice).ShouldNot(BeNil())
 			Ω(cfg.myRenamedSlice).Should(ConsistOf(1, 2))
