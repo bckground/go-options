@@ -1,6 +1,6 @@
 # Options Generator
 
-A fork of the [LaunchDarkly Options Generator](https://github.com/launchdarkly/go-options).
+A hard fork of the [LaunchDarkly Options Generator](https://github.com/launchdarkly/go-options).
 
 This Options Generator generates boilerplate code for setting options for a configuration struct using varargs syntax.  You write this:
 
