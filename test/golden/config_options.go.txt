@@ -26,11 +26,11 @@ func (f ApplyOptionFunc) apply(c *config) error {
 
 func newConfig(options ...Option) (config, error) {
 	var c config
-	err := applyConfigOptions(&c, options...)
+	err := applyOptionsToConfig(&c, options...)
 	return c, err
 }
 
-func applyConfigOptions(c *config, options ...Option) error {
+func applyOptionsToConfig(c *config, options ...Option) error {
 	c.myIntWithDefault = 1
 	c.myFloatWithDefault = 1.23
 	c.myStringWithDefault = `default string`

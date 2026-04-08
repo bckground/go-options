@@ -20,11 +20,11 @@ func (f ApplyPublicFuncOptionFunc) apply(c *configWithPublicNewFunc) error {
 
 func NewConfigWithPublicNewFunc(options ...PublicFuncOption) (configWithPublicNewFunc, error) {
 	var c configWithPublicNewFunc
-	err := applyConfigWithPublicNewFuncOptions(&c, options...)
+	err := applyOptionsToConfigWithPublicNewFunc(&c, options...)
 	return c, err
 }
 
-func applyConfigWithPublicNewFuncOptions(c *configWithPublicNewFunc, options ...PublicFuncOption) error {
+func applyOptionsToConfigWithPublicNewFunc(c *configWithPublicNewFunc, options ...PublicFuncOption) error {
 	for _, o := range options {
 		if err := o.apply(c); err != nil {
 			return err

@@ -20,11 +20,11 @@ func (f ApplyNoErrorOptionFunc) apply(c *configWithNoError) {
 
 func newConfigWithNoError(options ...NoErrorOption) configWithNoError {
 	var c configWithNoError
-	applyConfigWithNoErrorOptions(&c, options...)
+	applyOptionsToConfigWithNoError(&c, options...)
 	return c
 }
 
-func applyConfigWithNoErrorOptions(c *configWithNoError, options ...NoErrorOption) {
+func applyOptionsToConfigWithNoError(c *configWithNoError, options ...NoErrorOption) {
 	for _, o := range options {
 		o.apply(c)
 	}

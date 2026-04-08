@@ -20,11 +20,11 @@ func (f ApplySuffixOptionFunc) apply(c *configWithSuffix) error {
 
 func newConfigWithSuffix(options ...SuffixOption) (configWithSuffix, error) {
 	var c configWithSuffix
-	err := applyConfigWithSuffixOptions(&c, options...)
+	err := applyOptionsToConfigWithSuffix(&c, options...)
 	return c, err
 }
 
-func applyConfigWithSuffixOptions(c *configWithSuffix, options ...SuffixOption) error {
+func applyOptionsToConfigWithSuffix(c *configWithSuffix, options ...SuffixOption) error {
 	for _, o := range options {
 		if err := o.apply(c); err != nil {
 			return err

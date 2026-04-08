@@ -20,11 +20,11 @@ func (f ApplyUnquotedOptionFunc) apply(c *configWithUnquotedString) error {
 
 func newConfigWithUnquotedString(options ...UnquotedOption) (configWithUnquotedString, error) {
 	var c configWithUnquotedString
-	err := applyConfigWithUnquotedStringOptions(&c, options...)
+	err := applyOptionsToConfigWithUnquotedString(&c, options...)
 	return c, err
 }
 
-func applyConfigWithUnquotedStringOptions(c *configWithUnquotedString, options ...UnquotedOption) error {
+func applyOptionsToConfigWithUnquotedString(c *configWithUnquotedString, options ...UnquotedOption) error {
 	c.myString = "quoted"
 	for _, o := range options {
 		if err := o.apply(c); err != nil {

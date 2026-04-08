@@ -20,11 +20,11 @@ func (f ApplyMyOptFunc) apply(c *configWithDifferentPrefix) error {
 
 func newConfigWithDifferentPrefix(options ...MyOpt) (configWithDifferentPrefix, error) {
 	var c configWithDifferentPrefix
-	err := applyConfigWithDifferentPrefixOptions(&c, options...)
+	err := applyOptionsToConfigWithDifferentPrefix(&c, options...)
 	return c, err
 }
 
-func applyConfigWithDifferentPrefixOptions(c *configWithDifferentPrefix, options ...MyOpt) error {
+func applyOptionsToConfigWithDifferentPrefix(c *configWithDifferentPrefix, options ...MyOpt) error {
 	for _, o := range options {
 		if err := o.apply(c); err != nil {
 			return err

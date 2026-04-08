@@ -18,11 +18,11 @@ func (f ApplyNoCmpOptionFunc) apply(c *configWithoutCmp) error {
 
 func newConfigWithoutCmp(options ...NoCmpOption) (configWithoutCmp, error) {
 	var c configWithoutCmp
-	err := applyConfigWithoutCmpOptions(&c, options...)
+	err := applyOptionsToConfigWithoutCmp(&c, options...)
 	return c, err
 }
 
-func applyConfigWithoutCmpOptions(c *configWithoutCmp, options ...NoCmpOption) error {
+func applyOptionsToConfigWithoutCmp(c *configWithoutCmp, options ...NoCmpOption) error {
 	for _, o := range options {
 		if err := o.apply(c); err != nil {
 			return err

@@ -18,11 +18,11 @@ func (f ApplyNoStringerOptionFunc) apply(c *configWithoutStringer) error {
 
 func newConfigWithoutStringer(options ...NoStringerOption) (configWithoutStringer, error) {
 	var c configWithoutStringer
-	err := applyConfigWithoutStringerOptions(&c, options...)
+	err := applyOptionsToConfigWithoutStringer(&c, options...)
 	return c, err
 }
 
-func applyConfigWithoutStringerOptions(c *configWithoutStringer, options ...NoStringerOption) error {
+func applyOptionsToConfigWithoutStringer(c *configWithoutStringer, options ...NoStringerOption) error {
 	for _, o := range options {
 		if err := o.apply(c); err != nil {
 			return err
