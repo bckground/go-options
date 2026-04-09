@@ -160,7 +160,7 @@ option.  This method fulfills the `fmt.Stringer` interface, allowing more detail
 `go-options` can be customized with several command-line arguments:
 
 - `-fmt=false` disable running gofmt
-- `-func <string>` sets the name of function created to apply options to <type> (default is apply&lt;Type&gt;Options)
+- `-func <string>` sets the name of function created to apply options to <type> (default is applyOptionsTo&lt;Type&gt;)
 - `-new=false` controls generation of the function that returns a new config (default true)
 - `-cmp=false` controls whether we generate an `Equal` method that works with `github.com/google/go-cmp` (default true)
 - `-imports=[<path>|<alias>=<path>],...` add imports to generated file
