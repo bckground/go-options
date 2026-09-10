@@ -1,7 +1,6 @@
 issues:
   exclude-dirs:
     - "^test/golden"
-    - "^vendor$"
   exclude-rules:
     - text: "shadow: declaration of"
       path: ".*_test.go"
