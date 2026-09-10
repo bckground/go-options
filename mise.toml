@@ -1,0 +1,3 @@
+[tools]
+golang = { version = "1.26.1" }
+"go:gotest.tools/gotestsum" = { version = "1.13.0" }

@@ -1,2 +1,7 @@
 /go-options
 
+# gotestsum
+junitreport.xml
+
+# mise
+mise.local.toml

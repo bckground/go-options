@@ -1,0 +1,56 @@
+# For security reasons, the workflow in which the autofix.ci action is used must be named "autofix.ci".
+name: "autofix.ci"
+
+on:
+  push:
+    branches:
+      - "main"
+
+env:
+  S3_CREDENTIALS: >-
+    ${{ format('{{"endpoint": "{0}", "access_key": "{1}", "secret_key": "{2}", "bucket_name": "{3}"}}',
+        secrets.OVH_GHA_CACHE_ENDPOINT, vars.OVH_GHA_CACHE_USER_SECRET_ID, secrets.OVH_GHA_CACHE_USER_SECRET, secrets.OVH_GHA_CACHE_BUCKET_NAME) }}
+
+jobs:
+  files-changed:
+    name: "detect what files changed"
+    if: ${{ github.actor != 'autofix-ci[bot]' }}
+    runs-on: "ubuntu-latest"
+    timeout-minutes: 3
+    permissions:
+      contents: "read"
+      pull-requests: "read"
+    outputs:
+      prettier: "${{ steps.changes.outputs.prettier }}"
+    steps:
+      - uses: "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1" # v7.0.1
+
+      - uses: "dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d" # v4.0.3
+        id: "changes"
+        with:
+          filters: ".github/file-filters.yml"
+
+  format-and-autofix:
+    name: "format & autofix"
+    needs: "files-changed"
+    if: ${{ needs.files-changed.outputs.prettier == 'true' }}
+    runs-on: "ubuntu-latest"
+    timeout-minutes: 5
+    permissions:
+      contents: "read"
+    steps:
+      - uses: "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1" # v7.0.1
+
+      - uses: "bckground/actions/setup-mise@main"
+        with:
+          mise-envs: "ci"
+          cache-name: "go-options"
+          cache-backend: "github"
+          s3-credentials: "${{ env.S3_CREDENTIALS }}"
+
+      - name: "Run prettier"
+        run: |
+          prettier --config .prettierrc.yml --write "**/*.{yml,yaml,md,markdown,json,jsonc}"
+
+      - name: "Run autofix"
+        uses: "autofix-ci/action@c5b2d67aa2274e7b5a18224e8171550871fc7e4a" # v1.3.4

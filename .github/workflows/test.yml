@@ -1,0 +1,85 @@
+name: "test"
+
+on:
+  pull_request:
+    branches:
+      - "**"
+  push:
+    branches:
+      - "main"
+
+env:
+  S3_CREDENTIALS: >-
+    ${{ format('{{"endpoint": "{0}", "access_key": "{1}", "secret_key": "{2}", "bucket_name": "{3}"}}',
+        secrets.OVH_GHA_CACHE_ENDPOINT, vars.OVH_GHA_CACHE_USER_SECRET_ID, secrets.OVH_GHA_CACHE_USER_SECRET, secrets.OVH_GHA_CACHE_BUCKET_NAME) }}
+
+jobs:
+  files-changed:
+    name: "detect what files changed"
+    runs-on: "ubuntu-latest"
+    timeout-minutes: 3
+    permissions:
+      contents: "read"
+      pull-requests: "read"
+    outputs:
+      application: ${{ steps.changes.outputs.application }}
+    steps:
+      - uses: "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1" # v7.0.1
+
+      - uses: "dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d" # v4.0.3
+        id: "changes"
+        with:
+          filters: ".github/file-filters.yml"
+
+  all:
+    name: "all@ubuntu-latest"
+    needs: "files-changed"
+    if: ${{ needs.files-changed.outputs.application == 'true' }}
+    runs-on: "ubuntu-latest"
+    timeout-minutes: 10
+    permissions:
+      checks: "write"
+      contents: "read"
+      packages: "read"
+      attestations: "read"
+    steps:
+      - uses: "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1" # v7.0.1
+
+      - uses: "bckground/actions/setup-mise@main"
+        with:
+          mise-envs: "ci"
+          cache-name: "go-options"
+          cache-backend: "github"
+          s3-credentials: ${{ env.S3_CREDENTIALS }}
+
+      - id: "go-restore-caches"
+        uses: "bckground/actions/cache-go/restore@main"
+        with:
+          cache-backend: "github"
+          s3-credentials: ${{ env.S3_CREDENTIALS }}
+
+      - name: "Download all go dependencies"
+        run: |
+          go mod download
+
+      - name: "Confirm that go.mod and go.sum are tidy"
+        run: |
+          go mod tidy -diff
+
+      - name: "Run all tests"
+        shell: bash
+        run: |
+          make test
+
+      - name: "Publish test report"
+        uses: "mikepenz/action-junit-report@a9170d5795813c01ab4901ffb045b52bab4ab09d" # v6.5.0
+        if: ${{ success() || failure() }}
+        with:
+          check_name: "test report / all"
+          report_paths: "junitreport.xml"
+
+      - if: ${{ (github.ref_name == github.event.repository.default_branch || steps.go-restore-caches.outputs.cache-hit == 'false') && (success() || failure()) }}
+        uses: "bckground/actions/cache-go/save@main"
+        with:
+          cache-backend: "github"
+          s3-credentials: ${{ env.S3_CREDENTIALS }}
