@@ -1,7 +1,6 @@
-/go-options
-
 # gotestsum
 junitreport.xml
 
-# mise
+# local artifacts
 mise.local.toml
+.local/
