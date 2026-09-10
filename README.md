@@ -1,8 +1,10 @@
 # Options Generator
 
+[![test](https://github.com/bckground/go-options/actions/workflows/test.yml/badge.svg)](https://github.com/bckground/go-options/actions/workflows/test.yml)
+
 A hard fork of the [LaunchDarkly Options Generator](https://github.com/launchdarkly/go-options).
 
-This Options Generator generates boilerplate code for setting options for a configuration struct using varargs syntax.  You write this:
+This Options Generator generates boilerplate code for setting options for a configuration struct using varargs syntax. You write this:
 
 ```go
 //go:generate go-options -namespace=ConfigOptions -option=ConfigOption config
@@ -39,7 +41,7 @@ type config struct {
 }
 ```
 
-This would create `ConfigOptions.Number` with a default value of 5.  Entering the the tag `options:",5"` would keep the default `ConfigOptions.HowMany` name.
+This would create `ConfigOptions.Number` with a default value of 5. Entering the the tag `options:",5"` would keep the default `ConfigOptions.HowMany` name.
 
 You can also specify documentation using docstrings or line strings, so:
 
@@ -62,7 +64,6 @@ func (configOptionNamespace) HowMany(o int) Option {
 ```
 
 You can use nested structures to create multi-field options, so:
-
 
 ```go
 type config struct {
@@ -101,8 +102,7 @@ func (configOptionNamespace) Ints(nums ...int) Option {
 }
 ```
 
-
-You can use also use "*" at the beginning of a name in `options` tag to record whether an option was set, so:
+You can use also use "\*" at the beginning of a name in `options` tag to record whether an option was set, so:
 
 ```go
 type config struct {
@@ -145,15 +145,15 @@ The syntax for a tag is:
 
 ## For testing and debugging
 
-By default, generated options can be compared using `cmp.Equal` from `github.com/google/go-cmp`.  Simple options can
-also be compared simply with `==` because they are structs; more complex options involving variadic slices and pointers 
-require using `cmp.Equal` because pointers inside the options will not match.  To allow `cmp.Equal` compare options, the
-tool generates  an `Equal` method for each option.  Generation of `Equal` methods can be disabled by setting
+By default, generated options can be compared using `cmp.Equal` from `github.com/google/go-cmp`. Simple options can
+also be compared simply with `==` because they are structs; more complex options involving variadic slices and pointers
+require using `cmp.Equal` because pointers inside the options will not match. To allow `cmp.Equal` compare options, the
+tool generates an `Equal` method for each option. Generation of `Equal` methods can be disabled by setting
 `-cmp=false`.
 
 To aid with debugging and producing more meaningful error in tests, the tool generates a `String()` method for each
-option.  This method fulfills the `fmt.Stringer` interface, allowing more details about the option to be included in the
-`%v` format verb.  This behavior can be disabled by setting `-stringer=false`.
+option. This method fulfills the `fmt.Stringer` interface, allowing more details about the option to be included in the
+`%v` format verb. This behavior can be disabled by setting `-stringer=false`.
 
 ## Options
 
@@ -165,9 +165,9 @@ option.  This method fulfills the `fmt.Stringer` interface, allowing more detail
 - `-cmp=false` controls whether we generate an `Equal` method that works with `github.com/google/go-cmp` (default true)
 - `-imports=[<path>|<alias>=<path>],...` add imports to generated file
 - `-option <string>` sets name of the interface to use for options (default "Option")
-- `-output <string>` sets the name of the output file (default is <type>_options.go)
+- `-output <string>` sets the name of the output file (default is <type>\_options.go)
 - `-input <string>` sets the name of the input file. When set uses "go/build" and "go/parser" directly, which can result in performance improvements
 - `-namespace <string>` sets the name of the namespace variable for options (default is "${option}Namespace")
 - `-quote-default-strings=false` disables default quoting of default values for string
-- `-stringer=false` controls whether we generate an `String()` method that exposes option names and values.  Useful for debugging tests. (default true)
+- `-stringer=false` controls whether we generate an `String()` method that exposes option names and values. Useful for debugging tests. (default true)
 - `-type <string>` name of struct type to create options for (original syntax before multiple types on command-line were supported)
