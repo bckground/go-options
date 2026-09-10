@@ -31,7 +31,7 @@ jobs:
         with:
           filters: ".github/file-filters.yml"
 
-  format-and-autofix:
+  format:
     name: "format & autofix"
     needs: "files-changed"
     if: |
