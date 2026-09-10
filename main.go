@@ -20,23 +20,25 @@ import (
 	"golang.org/x/tools/go/packages"
 )
 
-var typeName string
-var packageName string
-var optionInterfaceName string
-var outputName string
-var inputFileName string
-var applyFunctionName string
-var applyOptionFunctionType string
-var createNewFunc bool
-var runGoFmt bool
-var optionNamespace string
-var buildTag string
-var imports string
-var quoteStrings bool
-var implementEqual bool
-var implementString bool
-var returnError bool
-var newFuncPublic bool
+var (
+	typeName                string
+	packageName             string
+	optionInterfaceName     string
+	outputName              string
+	inputFileName           string
+	applyFunctionName       string
+	applyOptionFunctionType string
+	createNewFunc           bool
+	runGoFmt                bool
+	optionNamespace         string
+	buildTag                string
+	imports                 string
+	quoteStrings            bool
+	implementEqual          bool
+	implementString         bool
+	returnError             bool
+	newFuncPublic           bool
+)
 
 var Usage = func() {
 	fmt.Fprintf(flag.CommandLine.Output(), "Usage of %s <type>:\n\n", os.Args[0])
@@ -47,21 +49,55 @@ var Usage = func() {
 
 func initFlags() {
 	flag.StringVar(&typeName, "type", "", "name of struct to create options for")
-	flag.StringVar(&packageName, "package", "", "name of the package where <type> is declared (default is all packages)")
+	flag.StringVar(
+		&packageName,
+		"package",
+		"",
+		"name of the package where <type> is declared (default is all packages)",
+	)
 	flag.BoolVar(&createNewFunc, "new", true, "whether to create a function to return a new config")
 	flag.StringVar(&optionInterfaceName, "option", "Option", "name of the interface to use for options")
-	flag.StringVar(&imports, "imports", "", "a comma-separated list of packages with optional alias (e.g. time,url=net/url) ")
+	flag.StringVar(
+		&imports,
+		"imports",
+		"",
+		"a comma-separated list of packages with optional alias (e.g. time,url=net/url) ",
+	)
 	flag.StringVar(&inputFileName, "input", "", "name of input file")
 	flag.StringVar(&outputName, "output", "", "name of output file (default is <type>_options.go)")
-	flag.StringVar(&applyFunctionName, "func", "", `name of function created to apply options to <type> (default is "apply<Type>Options")`)
-	flag.StringVar(&applyOptionFunctionType, "option_func", "",
-		`name of function type created to apply options with pointer receiver to <type> (default is "apply<Option>Func")`)
-	flag.StringVar(&optionNamespace, "namespace", "", `name of namespace variable for options (default is "${option}Namespace")`)
+	flag.StringVar(
+		&applyFunctionName,
+		"func",
+		"",
+		`name of function created to apply options to <type> (default is "apply<Type>Options")`,
+	)
+	flag.StringVar(
+		&applyOptionFunctionType,
+		"option_func",
+		"",
+		`name of function type created to apply options with pointer receiver to <type> (default is "apply<Option>Func")`,
+	)
+	flag.StringVar(
+		&optionNamespace,
+		"namespace",
+		"",
+		`name of namespace variable for options (default is "${option}Namespace")`,
+	)
 	flag.StringVar(&buildTag, "build", "", `build tags to add at the top of the file`)
-	flag.BoolVar(&quoteStrings, "quote-default-strings", true, `set to false to disable automatic quoting of string field defaults`)
+	flag.BoolVar(
+		&quoteStrings,
+		"quote-default-strings",
+		true,
+		`set to false to disable automatic quoting of string field defaults`,
+	)
 	flag.BoolVar(&implementString, "stringer", true, `set to false to disable creating String() method for options`)
 	flag.BoolVar(&implementEqual, "cmp", true, `set to false to disable creating Equals() method for options`)
-	flag.BoolVar(&returnError, "noerror", true, `set to false if you do not want to return an error when creating a new config`)
+	flag.BoolVar(
+		&returnError,
+		"noerror",
+		true,
+		`set to false if you do not want to return an error when creating a new config`,
+	)
 	flag.BoolVar(&runGoFmt, "fmt", true, `set to false to skip go format`)
 	flag.BoolVar(&newFuncPublic, "public", false, `set to true to make the 'new' function public`)
 	flag.Usage = Usage
@@ -348,7 +384,7 @@ func writeOptionsFile(types []string, packageName string, node ast.Node, fset *t
 		if err != nil {
 			log.Fatal(fmt.Errorf("template execute failed: %s", err))
 		}
-		if err := os.WriteFile(outputFileName, buf.Bytes(), 0644); err != nil {
+		if err := os.WriteFile(outputFileName, buf.Bytes(), 0o644); err != nil {
 			log.Fatal(fmt.Errorf("write failed: %s", err))
 		}
 		cmd := exec.Command("gofmt", "-w", outputFileName)

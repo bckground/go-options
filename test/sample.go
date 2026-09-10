@@ -61,8 +61,7 @@ type config struct {
 }
 
 //go:generate go run .. -func applyDifferent -option DifferentOption -new=false configWithDifferentApply
-type configWithDifferentApply struct {
-}
+type configWithDifferentApply struct{}
 
 //go:generate go run .. -namespace=MyOptNs -option=MyOpt configWithDifferentPrefix
 type configWithDifferentPrefix struct {
