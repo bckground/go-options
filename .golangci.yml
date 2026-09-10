@@ -1,24 +1,10 @@
-issues:
-  exclude-dirs:
-    - "^test/golden"
-  exclude-rules:
-    - text: "shadow: declaration of"
-      path: ".*_test.go"
-      linters:
-        - govet
-    - text: "fieldalignment: struct with"
-      path: "test/.*\\.go|.*_test\\.go"
-      linters:
-        - govet
+---
+version: "2"
 
-linters-settings:
-  govet:
-    enable-all: true
-
-  typecheck:
-    exclude-files:
-      - ".*_test.go$"
-
-linters:
-  disable:
-    - typecheck
+formatters:
+  enable:
+    - "gofumpt"
+    - "golines"
+  settings:
+    golines:
+      max-len: 120

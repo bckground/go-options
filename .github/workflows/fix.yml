@@ -22,6 +22,7 @@ jobs:
       pull-requests: "read"
     outputs:
       prettier: "${{ steps.changes.outputs.prettier }}"
+      go: "${{ steps.changes.outputs.go }}"
     steps:
       - uses: "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1" # v7.0.1
 
@@ -33,7 +34,9 @@ jobs:
   format-and-autofix:
     name: "format & autofix"
     needs: "files-changed"
-    if: ${{ needs.files-changed.outputs.prettier == 'true' }}
+    if: |
+      needs.files-changed.outputs.prettier == 'true' ||
+        needs.files-changed.outputs.go == 'true'
     runs-on: "ubuntu-latest"
     timeout-minutes: 5
     permissions:
@@ -51,6 +54,10 @@ jobs:
       - name: "Run prettier"
         run: |
           prettier --config .prettierrc.yml --write "**/*.{yml,yaml,md,markdown,json,jsonc}"
+
+      - name: "Format golang code"
+        run: |
+          golangci-lint fmt
 
       - name: "Run autofix"
         uses: "autofix-ci/action@c5b2d67aa2274e7b5a18224e8171550871fc7e4a" # v1.3.4

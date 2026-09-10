@@ -10,3 +10,8 @@ prettier:
   - "added|modified: '**/*.{md,markdown}'"
   - "added|modified: '**/*.{yml,yaml}'"
   - "added|modified: '**/*.{json,jsonc}'"
+
+go:
+  - "!.github/**" # autofix.ci refuses to touch the `.github` directory.
+  - "added|modified: '**/*.go'"
+  - ".golangci.yml"

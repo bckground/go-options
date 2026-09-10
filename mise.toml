@@ -1,3 +1,4 @@
 [tools]
 golang = { version = "1.26.1" }
+golangci-lint = { version = "2.13.2" }
 "go:gotest.tools/gotestsum" = { version = "1.13.0" }
